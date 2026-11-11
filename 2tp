@@ -1,0 +1,54 @@
+clear; clc; close all;
+
+R = 1;
+L = 0.3;
+w = 314;
+Vm = 220 * sqrt(2);
+
+tf = 0.3;
+dt = 0.0001;
+
+t = 0:dt:tf;
+N = length(t);
+
+I_rk4 = zeros(1, N);
+I_rk4(1) = 0;
+
+for n = 1:(N-1)
+    tn = t(n);
+    In = I_rk4(n);
+    
+    K1 = (Vm * sin(w * tn) - R * In) / L;
+    K2 = (Vm * sin(w * (tn + dt/2)) - R * (In + (dt/2) * K1)) / L;
+    K3 = (Vm * sin(w * (tn + dt/2)) - R * (In + (dt/2) * K2)) / L;
+    K4 = (Vm * sin(w * (tn + dt)) - R * (In + dt * K3)) / L;
+    
+    I_rk4(n+1) = In + (dt / 6) * (K1 + 2*K2 + 2*K3 + K4);
+end
+
+fprintf('=== Section 2.1 Result ===\n');
+fprintf('Calculated current I(1) at t = %.4f s: %.7f A\n', t(2), I_rk4(2));
+
+phi = atan((L * w) / R);
+A = (L * w * Vm) / (R^2 + (L * w)^2);
+Ig = A * exp(-(R/L) * t) + (Vm / sqrt(R^2 + (L * w)^2)) * sin(w * t - phi);
+
+error_I = abs(Ig - I_rk4);
+
+figure('Name', 'RL Circuit Simulation and Error Analysis', 'NumberTitle', 'off');
+
+subplot(2,1,1);
+plot(t, Ig, 'b-', 'LineWidth', 1.5); hold on;
+plot(t, I_rk4, 'r--', 'LineWidth', 1.2);
+grid on;
+xlabel('Time t (s)');
+ylabel('Current I(t) (A)');
+title('Comparison between Theoretical Current I_g(t) and RK4 Numerical Current I(t)');
+legend('Theoretical Current I_g(t)', 'RK4 Numerical Current I(t)', 'Location', 'northeast');
+
+subplot(2,1,2);
+plot(t, error_I, 'k-', 'LineWidth', 1.2);
+grid on;
+xlabel('Time t (s)');
+ylabel('Absolute Error |I_g(t) - I_{RK4}(t)| (A)');
+title('Error between Theoretical Current I_g(t) and RK4 Numerical Current I(t)');
