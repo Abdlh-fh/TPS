@@ -35,20 +35,30 @@ Ig = A * exp(-(R/L) * t) + (Vm / sqrt(R^2 + (L * w)^2)) * sin(w * t - phi);
 
 error_I = abs(Ig - I_rk4);
 
+% --- التعديل حسب توجيهات الأستاذة للرسم باستخدام subplot ---
 figure('Name', 'RL Circuit Simulation and Error Analysis', 'NumberTitle', 'off');
 
-subplot(2,1,1);
-plot(t, Ig, 'b-', 'LineWidth', 1.5); hold on;
-plot(t, I_rk4, 'r--', 'LineWidth', 1.2);
+% الرسم الأول (مقارنة التيارين باستخدام الطريقة المطلوبة)
+subplot(3,1,1);
+plot(t, Ig, 'r:', t, I_rk4, '*');
 grid on;
 xlabel('Time t (s)');
-ylabel('Current I(t) (A)');
-title('Comparison between Theoretical Current I_g(t) and RK4 Numerical Current I(t)');
-legend('Theoretical Current I_g(t)', 'RK4 Numerical Current I(t)', 'Location', 'northeast');
+ylabel('Current (A)');
+legend('Ig (Theoretical)', 'I_rk4 (Numerical)', 'Location', 'northeast');
+title('Comparison between Theoretical and RK4 Current');
 
-subplot(2,1,2);
-plot(t, error_I, 'k-', 'LineWidth', 1.2);
+% الرسم الثاني (التيار العددي وحده أو بالشكل المطلوب)
+subplot(3,1,2);
+plot(t, I_rk4, 'b-');
 grid on;
 xlabel('Time t (s)');
-ylabel('Absolute Error |I_g(t) - I_{RK4}(t)| (A)');
-title('Error between Theoretical Current I_g(t) and RK4 Numerical Current I(t)');
+ylabel('I_{rk4} (A)');
+title('Numerical Current I_{rk4}(t)');
+
+% الرسم الثالث (الخطأ المطلق)
+subplot(3,1,3);
+plot(t, error_I, 'k-');
+grid on;
+xlabel('Time t (s)');
+ylabel('Absolute Error (A)');
+title('Error between Theoretical and Numerical Current');
